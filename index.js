@@ -63,6 +63,51 @@ app.post("/auth/register", registerValidation, async (req, res) => {
   }
 });
 
+app.post("/auth/login", async (req, res) => {
+  try {
+    const user = await UserModel.findOne({ email: req.body.email });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User is not find",
+      });
+    }
+
+    const isValidPasswd = await bcrypt.compare(
+      req.body.password,
+      user._doc.passwordHash
+    );
+
+    if (!isValidPasswd) {
+      return res.status(400).json({
+        message: "Wrong email or password",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        _id: user._id,
+      },
+      "secret123",
+      {
+        expiresIn: "30d",
+      }
+    );
+
+    const { passwordHash, ...userData } = user._doc;
+
+    res.json({
+      ...userData,
+      token,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Failed to log in",
+    });
+  }
+});
+
 app.listen(4444, (err) => {
   if (err) {
     return console.log(err);
