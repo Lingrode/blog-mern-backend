@@ -51,6 +51,25 @@ export const getOne = async (req, res) => {
   }
 };
 
+export const remove = async (req, res) => {
+  try {
+    const postId = req.params.id;
+
+    PostModel.findOneAndDelete({
+      _id: postId,
+    }).then(() => {
+      res.json({
+        success: true,
+      });
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Failed to get article",
+    });
+  }
+};
+
 export const create = async (req, res) => {
   try {
     const doc = new PostModel({
