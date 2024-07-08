@@ -45,22 +45,24 @@ export const getOne = async (req, res) => {
       {
         returnDocument: "after",
       }
-    ).then((doc, err) => {
-      if (err) {
-        console.log(err);
-        return res.status(500).json({
-          message: "Failed to return article",
-        });
-      }
+    )
+      .populate("user")
+      .then((doc, err) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({
+            message: "Failed to return article",
+          });
+        }
 
-      if (!doc) {
-        return res.status(404).json({
-          message: "Article not found",
-        });
-      }
+        if (!doc) {
+          return res.status(404).json({
+            message: "Article not found",
+          });
+        }
 
-      res.json(doc);
-    });
+        res.json(doc);
+      });
   } catch (err) {
     console.log(err);
     res.status(500).json({
